@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# ANES Data (DO NOT COMMIT RAW MICRODATA)
+anes_timeseries_2024_csv_20250808/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts (optional - you may want to commit these for GitHub Pages)
+# Uncomment if you regenerate data frequently and don't want to commit outputs
+# anes_cluster_output/
+# site/data/*.json
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Claude Code
+.claude/
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,39 @@
+{
+  "tours": [
+    {
+      "id": "main_tour",
+      "title": "Welcome to ANES 2024 Ideological Clusters",
+      "steps": [
+        {
+          "title": "Welcome!",
+          "content": "This interactive site reveals 15 distinct ideological clusters among likely voters in the 2024 election. Discover where you fit and explore the political landscape.",
+          "placement": "center"
+        },
+        {
+          "target": "#explore-tab",
+          "title": "Explore the Landscape",
+          "content": "View clusters in 3D and 2D. Each point represents an ideological cluster—hover to see demographics, vote shares, and policy positions. Point size shows prevalence; color shows Party ID (red = Republican, blue = Democrat).",
+          "placement": "bottom"
+        },
+        {
+          "target": "#quiz-tab",
+          "title": "Find Your Cluster",
+          "content": "Answer 10 questions to discover which cluster you belong to. The quiz uses machine learning to predict your cluster with 61% accuracy.",
+          "placement": "bottom"
+        },
+        {
+          "target": "#persona-tab",
+          "title": "Chat with Personas",
+          "content": "Each cluster is represented by a simulated persona based on real survey data. Ask them about political issues and see how different ideological groups think.",
+          "placement": "bottom"
+        },
+        {
+          "target": "#about-tab",
+          "title": "About",
+          "content": "In the About tab, I describe the methodology and provide links to technical documentation.",
+          "placement": "bottom"
+        }
+      ]
+    }
+  ]
+}

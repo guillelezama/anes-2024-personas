@@ -1,0 +1,47 @@
+{
+  "title": "Statistical Insights: The 2024 Political Landscape",
+  "steps": [
+    {
+      "step": 1,
+      "title": "Overview",
+      "content": "We analyzed likely voters from the 2024 ANES survey and discovered 15 distinct ideological clusters using K-means clustering on ~50 policy dimensions. These clusters represent real patterns in how Americans combine different political beliefs across topics including abortion, immigration, fiscal policy, environment, healthcare, crime, Israel, and more.",
+      "highlight": null
+    },
+    {
+      "step": 2,
+      "title": "Partisan Distribution",
+      "content": "The most Republican-leaning cluster (Cluster 14) has an average Party ID of 6.3 (7 = Strong Republican) with 100% Trump support. The most Democratic cluster (Cluster 1) has Party ID 1.7 (1 = Strong Democrat) with 100% Harris support.",
+      "highlight": "explore_tab"
+    },
+    {
+      "step": 3,
+      "title": "The Middle Ground",
+      "content": "We found 2 clusters with moderate Party ID (between 3.5 and 4.5), suggesting that 2/15 clusters represent swing voters or independents. These groups show more varied combinations of policy preferences that don't align with traditional party platforms.",
+      "highlight": null
+    },
+    {
+      "step": 4,
+      "title": "Dominant Cluster",
+      "content": "The largest cluster (Cluster 0) represents 0.0% of likely voters. This cluster has Party ID 2.0, voted 0% Trump / 100% Harris, and is 0% college-educated.",
+      "highlight": "quiz_tab"
+    },
+    {
+      "step": 5,
+      "title": "Vote Shares Across All Clusters",
+      "content": "Across all 15 clusters weighted by size, Trump received 0.0% and Harris 0.0%. However, individual clusters vary dramatically\u2014from nearly 100% Trump in some clusters to nearly 100% Harris in others.",
+      "highlight": null
+    },
+    {
+      "step": 6,
+      "title": "Evidence-Based Personas",
+      "content": "We created 15 simulated personas that represent each cluster's statistical profile. Each persona's stances are derived from: (1) observed survey responses on the ~50 clustering dimensions, (2) ML predictions for related attitudes, or (3) fictional extrapolation for unmeasured topics. All evidence levels are clearly labeled.",
+      "highlight": "persona_tab"
+    },
+    {
+      "step": 7,
+      "title": "Explore the Data",
+      "content": "Use the 3D cube to see how clusters differ across all policy dimensions. The 2D map uses PCA to project all dimensions onto a plane. Hover over any cluster to see full demographics: gender, age, education, region, and more. Take the 10-question quiz to find your nearest cluster!",
+      "highlight": "explore_tab"
+    }
+  ]
+}

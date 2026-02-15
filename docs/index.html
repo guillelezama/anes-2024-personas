@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANES 2024 Ideological Clusters</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+</head>
+<body>
+    <!-- Welcome Tour Overlay (shown on first visit) -->
+    <div id="welcome-overlay" class="overlay hidden">
+        <div class="tour-modal">
+            <button id="tour-close" class="tour-close">&times;</button>
+            <h2 id="tour-title"></h2>
+            <p id="tour-content"></p>
+            <div class="tour-controls">
+                <button id="tour-prev" class="btn btn-secondary">Previous</button>
+                <span id="tour-step-indicator"></span>
+                <button id="tour-next" class="btn btn-primary">Next</button>
+            </div>
+            <label class="tour-checkbox">
+                <input type="checkbox" id="tour-dont-show">
+                Don't show this again
+            </label>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <h1>ANES 2024 Ideological Clusters</h1>
+            <p class="subtitle">Exploring the political landscape behind Trump vs Harris</p>
+            <button id="replay-tour-btn" class="btn btn-outline">Play Tour</button>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-nav">
+        <div class="container">
+            <button class="tab-btn active" data-tab="explore" id="explore-tab">
+                <span class="tab-icon">🗺️</span> Explore
+            </button>
+            <button class="tab-btn" data-tab="quiz" id="quiz-tab">
+                <span class="tab-icon">❓</span> Find Your Cluster
+            </button>
+            <button class="tab-btn" data-tab="persona" id="persona-tab">
+                <span class="tab-icon">💬</span> Persona Chat
+            </button>
+            <button class="tab-btn" data-tab="about" id="about-tab">
+                <span class="tab-icon">ℹ️</span> About
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- TAB 1: EXPLORE -->
+        <section id="explore-content" class="tab-content active">
+            <h2>Explore the Ideological Landscape</h2>
+
+            <div class="viz-explanation">
+                <p>
+                    This project identified <strong>15 ideological clusters</strong> among likely voters in the ANES 2024 survey
+                    by analyzing their positions on ~50 policy questions. The 3D cube below lets you explore how
+                    these clusters relate to each other across any three policy dimensions you choose.
+                </p>
+                <p><strong>How to use:</strong></p>
+                <ul>
+                    <li><strong>Pick your axes:</strong> Use the X, Y, and Z dropdowns to select which policy questions to plot. Rotate and zoom the cube to explore from different angles.</li>
+                    <li><strong>Each point</strong> is one cluster (not an individual voter). <strong>Size</strong> = share of voters. <strong>Color</strong> = average Party ID: <span style="color:#1f77b4;font-weight:bold;">Blue = Democrat</span>, <span style="color:#d62728;font-weight:bold;">Red = Republican</span>.</li>
+                    <li><strong>Hover</strong> over a point to see demographics, vote shares, and region breakdown.</li>
+                    <li><strong>Standardized axes:</strong> All policy variables were z-score standardized (mean = 0, SD = 1) so they are comparable across different original scales (1-4, 1-5, 1-7, etc.). A value of 0 is the average across all likely voters; negative values are below average, positive values are above average.</li>
+                </ul>
+            </div>
+
+            <!-- Visualization Toggle -->
+            <div class="viz-controls">
+                <button class="viz-toggle active" data-viz="3d">3D Cube</button>
+                <button class="viz-toggle" data-viz="2d">2D Map</button>
+            </div>
+
+            <!-- 3D Cube -->
+            <div id="viz-3d" class="visualization-container">
+                <div class="axis-selectors">
+                    <label>X-axis: <select id="dim-x"></select></label>
+                    <label>Y-axis: <select id="dim-y"></select></label>
+                    <label>Z-axis: <select id="dim-z"></select></label>
+                </div>
+                <div id="plot-3d" class="plot-container"></div>
+                <div id="dimension-questions" class="dimension-questions">
+                    <!-- Question text will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- 2D Map -->
+            <div id="viz-2d" class="visualization-container hidden">
+                <div id="plot-2d" class="plot-container"></div>
+                <p class="viz-note">2D projection using PCA. Hover over clusters to see details.</p>
+            </div>
+
+            <!-- Cluster Legend -->
+            <div id="cluster-legend" class="cluster-legend">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- TAB 2: QUIZ -->
+        <section id="quiz-content" class="tab-content">
+            <h2>Find Your Cluster</h2>
+            <p class="intro">Answer these 10 questions to discover which ideological cluster you belong to.</p>
+
+            <div id="quiz-container">
+                <!-- Questions populated by JS -->
+            </div>
+
+            <button id="submit-quiz" class="btn btn-primary btn-large hidden">Submit Quiz</button>
+
+            <!-- Results -->
+            <div id="quiz-results" class="quiz-results hidden">
+                <h3>Your Result</h3>
+                <div id="assigned-cluster-info"></div>
+                <h4>Nearest Clusters</h4>
+                <div id="nearest-clusters"></div>
+                <h4>Farthest Cluster</h4>
+                <div id="farthest-cluster"></div>
+            </div>
+        </section>
+
+        <!-- TAB 3: PERSONA CHAT -->
+        <section id="persona-content" class="tab-content">
+            <h2>Chat with a Cluster Persona</h2>
+            <p class="intro">These are simulated, fictional characters representing each cluster's statistical profile. Ask them about political issues.</p>
+
+            <div class="persona-selector">
+                <label for="persona-select">Select a persona:</label>
+                <select id="persona-select">
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+
+            <div id="persona-info" class="persona-info">
+                <!-- Persona details populated by JS -->
+            </div>
+
+            <!-- Cluster distributions removed -->
+
+            <div class="chat-container">
+                <div id="chat-messages" class="chat-messages">
+                    <!-- Chat messages appear here -->
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="Ask a question (e.g., 'What do you think about Bad Bunny singing only in Spanish at the Super Bowl halftime?')">
+                    <button id="chat-send" class="btn btn-primary">Send</button>
+                </div>
+            </div>
+
+            <div id="persona-stances-section" class="persona-stances-section" style="margin-top: 30px; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+                <button id="toggle-stances" class="btn btn-outline" style="font-size: 18px; font-weight: bold; background: #4a90e2; color: white; border: none; padding: 15px 25px; width: 100%; text-align: center; cursor: pointer;">
+                    ▼ View Full Policy Positions
+                </button>
+                <div id="persona-stances" class="persona-stances hidden">
+                    <!-- Policy positions populated by JS -->
+                </div>
+            </div>
+
+            <div class="llm-toggle">
+                <label>
+                    <input type="checkbox" id="enable-live-llm" checked>
+                    Enable live LLM chat (powered by backend AI)
+                </label>
+                <p class="llm-note">💡 LLM chat provides dynamic, conversational responses powered by OpenAI. Uncheck to use rule-based keyword matching instead.</p>
+            </div>
+        </section>
+
+        <!-- TAB 5: ABOUT -->
+        <section id="about-content" class="tab-content">
+            <h2>About This Project</h2>
+
+            <div class="about-section">
+                <h3>Overview</h3>
+                <p>
+                    This project uses K-means clustering on ~50 policy attitude questions from the
+                    <a href="https://electionstudies.org/" target="_blank">ANES 2024 Time Series Study</a>
+                    to identify distinct ideological clusters in the American electorate. The analysis
+                    reveals how voters combine policy positions across topics like abortion, immigration,
+                    fiscal policy, environment, crime, and foreign affairs.
+                </p>
+                <p>
+                    Rather than forcing voters into simple "liberal" or "conservative" boxes, this approach
+                    discovers natural groupings based on actual policy combinations. Some clusters align
+                    closely with traditional party platforms; others represent cross-cutting coalitions
+                    that defy conventional labels.
+                </p>
+            </div>
+
+            <div class="about-section">
+                <h3>Methodology</h3>
+                <ul class="about-list">
+                    <li><strong>Universe:</strong> "Likely voters" (respondents who definitely or probably will vote in 2024)</li>
+                    <li><strong>Features:</strong> 49 pre-core policy variables (V241xxx) spanning abortion/gender, immigration, fiscal policy, environment, healthcare, crime, Israel/Palestine, education, trust in government, and political rights</li>
+                    <li><strong>Feature Selection:</strong> Variables with >25% missing data excluded; all scales preserved in original direction (no flipping)</li>
+                    <li><strong>Preprocessing:</strong> Median imputation for missing values, z-score standardization to ensure equal weighting across different scales</li>
+                    <li><strong>Distance Metric:</strong> Variance-weighted Euclidean distance (features with higher variance receive proportionally higher weight: weight = √variance)</li>
+                    <li><strong>Algorithm:</strong> K-means clustering with k-means++ initialization, 50 random restarts</li>
+                    <li><strong>K Selection:</strong> K=15 selected from range [8-20] using silhouette score with a small penalty for distance from target K=15 (a design choice favoring granularity over parsimony; see technical note for details)</li>
+                    <li><strong>Cluster separation:</strong> Silhouette score is 0.045 and stability ARI is 0.54, indicating soft, overlapping clusters. These are best understood as <strong>fuzzy ideological prototypes</strong>, not hard-edged voter "types"</li>
+                    <li><strong>Quiz:</strong> 10 features selected by Random Forest feature importance to predict cluster membership (61% accuracy vs 79% with all 49 features)</li>
+                    <li><strong>Persona Stances:</strong> Cluster-level means computed directly from survey data; LLM chat uses explicit directional stances to ensure consistency</li>
+                </ul>
+            </div>
+
+            <div class="about-section">
+                <h3>LLM Validation Experiment</h3>
+                <p>
+                    To validate the LLM persona approach, I tested whether GPT-4o-mini can predict
+                    individual respondents' crime policy positions (urban unrest response, death penalty,
+                    federal crime spending) from their other 46 policy positions alone, and whether
+                    adding demographics (gender, age, education, race) improves predictions.
+                    The experiment sampled 200 respondents, each evaluated under two conditions.
+                </p>
+                <p><strong>Per-question results (200 individuals):</strong></p>
+                <table style="width:100%;border-collapse:collapse;margin:10px 0 15px;font-size:0.95em;">
+                    <thead>
+                        <tr style="border-bottom:2px solid var(--color-border);">
+                            <th style="text-align:left;padding:6px;">Question</th>
+                            <th style="text-align:center;padding:6px;">Ideology Only<br>Correct %</th>
+                            <th style="text-align:center;padding:6px;">Ideology Only<br>Within &plusmn;1</th>
+                            <th style="text-align:center;padding:6px;">+ Demographics<br>Correct %</th>
+                            <th style="text-align:center;padding:6px;">+ Demographics<br>Within &plusmn;1</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--color-border);">
+                            <td style="padding:6px;">Urban Unrest (1-7)</td>
+                            <td style="text-align:center;padding:6px;">31.5%</td>
+                            <td style="text-align:center;padding:6px;">48.0%</td>
+                            <td style="text-align:center;padding:6px;">31.5%</td>
+                            <td style="text-align:center;padding:6px;">49.5%</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--color-border);">
+                            <td style="padding:6px;">Death Penalty (1-4)</td>
+                            <td style="text-align:center;padding:6px;">34.0%</td>
+                            <td style="text-align:center;padding:6px;">63.0%</td>
+                            <td style="text-align:center;padding:6px;">39.5%</td>
+                            <td style="text-align:center;padding:6px;">72.0%</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--color-border);">
+                            <td style="padding:6px;">Crime Spending (1-5)</td>
+                            <td style="text-align:center;padding:6px;">41.0%</td>
+                            <td style="text-align:center;padding:6px;">77.0%</td>
+                            <td style="text-align:center;padding:6px;">48.0%</td>
+                            <td style="text-align:center;padding:6px;">75.0%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    <strong>Takeaway:</strong> Policy positions alone allow the LLM to predict held-out
+                    crime stances with 32-41% exact accuracy and 48-77% within &plusmn;1 point. Demographics
+                    provide a modest improvement, mainly for death penalty (+5.5pp correct, +9pp within &plusmn;1).
+                    This confirms that ideological coherence exists across policy domains, while also justifying
+                    the design choice to provide <strong>explicit data-driven stances</strong> to the persona
+                    chat rather than relying on LLM inference alone.
+                </p>
+                <p>
+                    <a href="docs/llm_validation_report.html" target="_blank" class="btn btn-primary">View Full Validation Report with Charts &rarr;</a>
+                </p>
+            </div>
+
+            <div class="about-section">
+                <h3>Technical Details</h3>
+                <p>
+                    For comprehensive documentation covering the complete analysis pipeline—including
+                    data universe definition, feature selection criteria, variance weighting methodology,
+                    clustering algorithm details, stability analysis, and persona generation—see:
+                </p>
+                <p>
+                    <a href="docs/technical_note.md" target="_blank" class="btn btn-primary">Read Technical Note</a>
+                </p>
+            </div>
+
+            <div class="about-section">
+                <h3>Created By</h3>
+                <p>
+                    <strong>Guillermo Lezama</strong><br>
+                    Data Scientist and PhD in Economics
+                </p>
+                <p>
+                    <a href="https://guillelezama.com" target="_blank" class="btn btn-outline">Website</a>
+                    <a href="https://linkedin.com/in/guillelezama" target="_blank" class="btn btn-outline">LinkedIn</a>
+                    <a href="https://github.com/guillelezama" target="_blank" class="btn btn-outline">GitHub</a>
+                </p>
+            </div>
+
+            <div class="about-section">
+                <h3>Feedback & Suggestions</h3>
+                <p>
+                    This is an ongoing research project. If you have feedback, find errors, or have
+                    suggestions for improvement, please reach out via:
+                </p>
+                <ul class="about-list">
+                    <li><strong>GitHub:</strong> <a href="https://github.com/guillelezama/anes-2024-personas/issues" target="_blank">Submit an issue</a></li>
+                    <li><strong>LinkedIn:</strong> <a href="https://linkedin.com/in/guillelezama" target="_blank">Send a message</a></li>
+                </ul>
+            </div>
+
+            <div class="about-section">
+                <h3>Data & Code</h3>
+                <p>
+                    <strong>Data Source:</strong> <a href="https://electionstudies.org/" target="_blank">ANES 2024 Time Series Study</a><br>
+                    <strong>Code Repository:</strong> <a href="https://github.com/guillelezama/anes-2024-personas" target="_blank">GitHub</a> (Python clustering pipeline + static site generator)<br>
+                    <strong>License:</strong> MIT (code) / ANES data subject to ANES terms of use
+                </p>
+            </div>
+
+            <div class="about-section">
+                <h3>Acknowledgments</h3>
+                <p>
+                    This project uses data from the American National Election Studies (ANES).
+                    The ANES is a collaboration of Stanford University, the University of Michigan,
+                    and funded by the National Science Foundation.
+                </p>
+                <p class="disclaimer">
+                    <em>Disclaimer: This is an independent educational project. Any opinions,
+                    findings, and conclusions or recommendations expressed here are those of
+                    the author and do not necessarily reflect the views of ANES or the NSF.</em>
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <p>
+                Data: ANES 2024 Time Series |
+                <a href="docs/technical_note.md" target="_blank">Technical Note</a> |
+                <a href="https://github.com/guillelezama/anes-2024-personas" target="_blank">GitHub</a>
+            </p>
+            <p class="disclaimer">
+                This is an educational project. Personas are simulated and fictional, not real individuals.
+                All stances are based on statistical analysis of survey data.
+            </p>
+            <p style="margin-top:15px;">
+                <strong>Personal Website:</strong> <a href="https://guillelezama.com" target="_blank" style="color:var(--color-primary);font-weight:600;">guillelezama.com</a> |
+                <strong>LinkedIn:</strong> <a href="https://linkedin.com/in/guillelezama" target="_blank" style="color:var(--color-primary);font-weight:600;">guillelezama</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="assets/app.js"></script>
+</body>
+</html>

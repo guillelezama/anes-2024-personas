@@ -1,0 +1,11 @@
+{
+  "name": "anes-2024-clusters-api",
+  "version": "1.0.0",
+  "description": "Serverless API proxy for ANES 2024 Clusters persona chat",
+  "main": "chat.js",
+  "type": "module",
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.x"
+  }
+}

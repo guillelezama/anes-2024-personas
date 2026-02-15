@@ -1,0 +1,103 @@
+{
+  "experiment": "crime_prediction",
+  "description": "Predict crime policy positions from all other policy positions",
+  "model": "gpt-4o",
+  "clusters": [
+    {
+      "cluster_id": 0,
+      "predictions": {
+        "police_funding": 3.0,
+        "death_penalty": 5.0,
+        "gun_background_checks": 2.0
+      },
+      "ground_truth": {
+        "V241397": 1.97,
+        "V241308x": 2.44,
+        "V241272x": 1.68
+      },
+      "accuracy": {
+        "mae": 1.3033333333333335,
+        "rmse": 1.6038391440540414,
+        "within_1": 0.3333333333333333
+      }
+    },
+    {
+      "cluster_id": 1,
+      "predictions": {
+        "police_funding": 3.5,
+        "death_penalty": 4.5,
+        "gun_background_checks": 2.0
+      },
+      "ground_truth": {
+        "V241397": 1.98,
+        "V241308x": 3.18,
+        "V241272x": 2.55
+      },
+      "accuracy": {
+        "mae": 1.13,
+        "rmse": 1.2048928029773713,
+        "within_1": 0.3333333333333333
+      }
+    },
+    {
+      "cluster_id": 2,
+      "predictions": {
+        "police_funding": 3.0,
+        "death_penalty": 4.5,
+        "gun_background_checks": 2.0
+      },
+      "ground_truth": {
+        "V241397": 1.67,
+        "V241308x": 2.77,
+        "V241272x": 2.51
+      },
+      "accuracy": {
+        "mae": 1.19,
+        "rmse": 1.2938186374707494,
+        "within_1": 0.3333333333333333
+      }
+    },
+    {
+      "cluster_id": 3,
+      "predictions": {
+        "police_funding": 6.0,
+        "death_penalty": 2.0,
+        "gun_background_checks": 1.0
+      },
+      "ground_truth": {
+        "V241397": 1.49,
+        "V241308x": 3.53,
+        "V241272x": 3.29
+      },
+      "accuracy": {
+        "mae": 2.776666666666666,
+        "rmse": 3.0509615970488166,
+        "within_1": 0.0
+      }
+    },
+    {
+      "cluster_id": 4,
+      "predictions": {
+        "police_funding": 4.0,
+        "death_penalty": 3.0,
+        "gun_background_checks": 2.0
+      },
+      "ground_truth": {
+        "V241397": 3.13,
+        "V241308x": 2.38,
+        "V241272x": 2.43
+      },
+      "accuracy": {
+        "mae": 0.6400000000000001,
+        "rmse": 0.664880941723153,
+        "within_1": 1.0
+      }
+    }
+  ],
+  "aggregate": {
+    "mean_mae": 1.408,
+    "mean_rmse": 1.5636786246548264,
+    "mean_within_1": 0.4,
+    "n_clusters_tested": 5
+  }
+}
