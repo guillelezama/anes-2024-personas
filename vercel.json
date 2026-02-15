@@ -1,15 +1,6 @@
 {
   "version": 2,
-  "name": "anes-2024-clusters",
-  "buildCommand": "python build_site_data.py --universe likely_voters",
-  "outputDirectory": "docs",
-  "devCommand": "python -m http.server 8000 --directory docs",
   "public": true,
-  "regions": ["iad1"],
-  "env": {
-    "OPENAI_API_KEY": "@openai-api-key",
-    "ANTHROPIC_API_KEY": "@anthropic-api-key"
-  },
   "routes": [
     {
       "src": "/api/(.*)",
