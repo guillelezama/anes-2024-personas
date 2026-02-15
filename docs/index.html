@@ -207,7 +207,7 @@
                     <li><strong>K Selection:</strong> K=15 selected from range [8-20] using silhouette score with a small penalty for distance from target K=15 (a design choice favoring granularity over parsimony; see technical note for details)</li>
                     <li><strong>Cluster separation:</strong> Silhouette score is 0.045 and stability ARI is 0.54, indicating soft, overlapping clusters. These are best understood as <strong>fuzzy ideological prototypes</strong>, not hard-edged voter "types"</li>
                     <li><strong>Quiz:</strong> 10 features selected by Random Forest feature importance to predict cluster membership (61% accuracy vs 79% with all 49 features)</li>
-                    <li><strong>Persona Stances:</strong> Cluster-level means computed directly from survey data; LLM chat uses explicit directional stances to ensure consistency</li>
+                    <li><strong>Persona Stances:</strong> Cluster-level means computed directly from survey data; LLM chat uses explicit directional stances to ensure consistency (<a href="docs/example_prompt.html" target="_blank">see example prompt</a>)</li>
                 </ul>
             </div>
 
