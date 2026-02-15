@@ -1,6 +1,8 @@
 {
   "version": 2,
-  "public": true,
+  "buildCommand": "",
+  "outputDirectory": "docs",
+  "framework": null,
   "routes": [
     {
       "src": "/api/(.*)",
@@ -8,7 +10,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/docs/$1"
+      "dest": "/$1"
     }
   ]
 }
