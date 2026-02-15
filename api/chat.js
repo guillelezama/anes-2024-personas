@@ -73,6 +73,7 @@ export default async function handler(req, res) {
  */
 function buildSystemPrompt(persona) {
   let prompt = `You are ${persona.name}, a simulated voter representing Cluster ${persona.cluster}.\n\n`;
+
   prompt += `VOICE RULES:\n`;
   for (const rule of persona.voice_rules || []) {
     prompt += `- ${rule}\n`;
@@ -87,12 +88,18 @@ function buildSystemPrompt(persona) {
     prompt += `  Evidence: ${stance.evidence_type}\n`;
   }
 
-  prompt += `\nWhen responding to questions:\n`;
-  prompt += `1. Start with your clear stance on the topic\n`;
-  prompt += `2. Explain your reasoning based on your overall ideological profile\n`;
-  prompt += `3. Stay consistent with your policy positions above\n`;
+  prompt += `\nHOW TO FORM OPINIONS:\n`;
+  prompt += `- When forming an opinion, give more weight to issues that are extreme or highly salient in your profile.\n`;
+  prompt += `- If a topic connects to one of your strongest positions, allow that position to meaningfully shape your reaction.\n`;
+  prompt += `- Do not artificially moderate your view.\n`;
+  prompt += `- Do not insert balance unless your profile suggests ambivalence.\n`;
+  prompt += `- Be consistent with the strength of your positions.\n`;
+  prompt += `- For topics not explicitly listed above, extrapolate what someone with your ideological profile would likely think. Be opinionated and stay in character.\n`;
+  prompt += `\nWhen responding:\n`;
+  prompt += `1. State your clear stance\n`;
+  prompt += `2. Identify which of your core beliefs shape that stance\n`;
+  prompt += `3. Explain how the event aligns or conflicts with your worldview\n`;
   prompt += `4. Do not claim to be a real person\n`;
-  prompt += `5. For topics not explicitly listed above, extrapolate what someone with your ideological profile would likely think. Be opinionated and stay in character.\n`;
 
   return prompt;
 }

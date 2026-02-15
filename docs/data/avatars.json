@@ -355,7 +355,12 @@
           "value": 3.91,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Strong Democrat",
+      "vote_2024": "Kamala Harris",
+      "vote_trump_pct": 0.0,
+      "vote_harris_pct": 100.0,
+      "demographics_summary": "mixed gender, 76% college-educated"
     },
     "1": {
       "name": "Jordan",
@@ -712,7 +717,12 @@
           "value": 3.8,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Strong Democrat",
+      "vote_2024": "Kamala Harris",
+      "vote_trump_pct": 0.0,
+      "vote_harris_pct": 100.0,
+      "demographics_summary": "mixed gender, 84% college-educated"
     },
     "2": {
       "name": "Morgan",
@@ -1069,7 +1079,12 @@
           "value": 2.34,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Strong Democrat",
+      "vote_2024": "Kamala Harris",
+      "vote_trump_pct": 2.3,
+      "vote_harris_pct": 95.9,
+      "demographics_summary": "mostly women, 84% college-educated"
     },
     "3": {
       "name": "Casey",
@@ -1426,7 +1441,12 @@
           "value": 1.46,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Strong Democrat",
+      "vote_2024": "Kamala Harris",
+      "vote_trump_pct": 0.0,
+      "vote_harris_pct": 92.0,
+      "demographics_summary": "mixed gender, 85% college-educated"
     },
     "4": {
       "name": "Alex",
@@ -1783,7 +1803,12 @@
           "value": 3.91,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Strong Democrat",
+      "vote_2024": "Kamala Harris",
+      "vote_trump_pct": 7.7,
+      "vote_harris_pct": 91.7,
+      "demographics_summary": "mixed gender, 74% college-educated"
     },
     "5": {
       "name": "Riley",
@@ -2140,7 +2165,12 @@
           "value": 4.97,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Lean Democrat",
+      "vote_2024": "Kamala Harris",
+      "vote_trump_pct": 13.5,
+      "vote_harris_pct": 79.8,
+      "demographics_summary": "mixed gender, 75% college-educated"
     },
     "6": {
       "name": "Quinn",
@@ -2497,7 +2527,12 @@
           "value": 4.28,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Independent",
+      "vote_2024": "Kamala Harris",
+      "vote_trump_pct": 22.9,
+      "vote_harris_pct": 76.5,
+      "demographics_summary": "mostly women, 65% college-educated"
     },
     "7": {
       "name": "Avery",
@@ -2854,7 +2889,12 @@
           "value": 4.31,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Lean Democrat",
+      "vote_2024": "Kamala Harris",
+      "vote_trump_pct": 20.9,
+      "vote_harris_pct": 74.3,
+      "demographics_summary": "mixed gender, 51% college-educated"
     },
     "8": {
       "name": "Cameron",
@@ -3211,7 +3251,12 @@
           "value": 4.54,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Independent",
+      "vote_2024": "leaning toward Donald Trump (60.5% Trump vs 31.6% Harris)",
+      "vote_trump_pct": 60.5,
+      "vote_harris_pct": 31.6,
+      "demographics_summary": "mixed gender, 41% college-educated"
     },
     "9": {
       "name": "Sage",
@@ -3568,7 +3613,12 @@
           "value": 4.72,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Lean Republican",
+      "vote_2024": "Donald Trump",
+      "vote_trump_pct": 70.3,
+      "vote_harris_pct": 19.7,
+      "demographics_summary": "mixed gender, 56% college-educated"
     },
     "10": {
       "name": "Skylar",
@@ -3925,7 +3975,12 @@
           "value": 5.82,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Strong Republican",
+      "vote_2024": "Donald Trump",
+      "vote_trump_pct": 89.7,
+      "vote_harris_pct": 9.3,
+      "demographics_summary": "mixed gender, 55% college-educated"
     },
     "11": {
       "name": "Dakota",
@@ -4282,7 +4337,12 @@
           "value": 6.07,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Strong Republican",
+      "vote_2024": "Donald Trump",
+      "vote_trump_pct": 88.8,
+      "vote_harris_pct": 5.6,
+      "demographics_summary": "mixed gender, 57% college-educated"
     },
     "12": {
       "name": "Reese",
@@ -4639,7 +4699,12 @@
           "value": 5.89,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Strong Republican",
+      "vote_2024": "Donald Trump",
+      "vote_trump_pct": 94.5,
+      "vote_harris_pct": 5.5,
+      "demographics_summary": "mixed gender, 61% college-educated"
     },
     "13": {
       "name": "Parker",
@@ -4996,7 +5061,12 @@
           "value": 5.25,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Strong Republican",
+      "vote_2024": "Donald Trump",
+      "vote_trump_pct": 97.4,
+      "vote_harris_pct": 1.4,
+      "demographics_summary": "mostly men, 76% college-educated"
     },
     "14": {
       "name": "Blake",
@@ -5353,7 +5423,12 @@
           "value": 6.6,
           "variable": "V241412x"
         }
-      }
+      },
+      "party_affiliation": "Strong Republican",
+      "vote_2024": "Donald Trump",
+      "vote_trump_pct": 100.0,
+      "vote_harris_pct": 0.0,
+      "demographics_summary": "mixed gender, 52% college-educated"
     }
   }
 }
