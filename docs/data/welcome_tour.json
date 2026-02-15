@@ -18,7 +18,7 @@
         {
           "target": "#quiz-tab",
           "title": "Find Your Cluster",
-          "content": "Answer 10 questions to discover which cluster you belong to. The quiz uses machine learning to predict your cluster with 61% accuracy.",
+          "content": "Answer 10 questions to discover which cluster you belong to.",
           "placement": "bottom"
         },
         {
