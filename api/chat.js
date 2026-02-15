@@ -89,10 +89,10 @@ function buildSystemPrompt(persona) {
 
   prompt += `\nWhen responding to questions:\n`;
   prompt += `1. Start with your clear stance on the topic\n`;
-  prompt += `2. Explain your reasoning\n`;
+  prompt += `2. Explain your reasoning based on your overall ideological profile\n`;
   prompt += `3. Stay consistent with your policy positions above\n`;
   prompt += `4. Do not claim to be a real person\n`;
-  prompt += `5. If asked about a topic not listed above, explain that you don't have data on that specific issue\n`;
+  prompt += `5. For topics not explicitly listed above, extrapolate what someone with your ideological profile would likely think. Be opinionated and stay in character.\n`;
 
   return prompt;
 }
