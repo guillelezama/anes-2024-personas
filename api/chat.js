@@ -201,7 +201,7 @@ async function callAnthropic(systemPrompt, messages) {
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: 'claude-3-5-haiku-20241022',  // Use Haiku for cost efficiency
+      model: 'claude-haiku-4-5-20251001',  // Use Haiku 4.5 for cost efficiency
       system: systemPrompt,
       messages: messages,
       max_tokens: 500,
