@@ -154,26 +154,26 @@
 
             <tr>
                 <td><strong>Urban Unrest Response</strong><br><small>1 = solve problems of racism/police violence, 7 = use all available force</small></td>
-                <td class="metric-medium">31.5%</td>
-                <td class="metric-bad">48.0%</td>
-                <td class="metric-medium">31.5%</td>
-                <td class="metric-bad">49.5%</td>
+                <td class="metric-medium">30.5%</td>
+                <td class="metric-medium">66.0%</td>
+                <td class="metric-medium">34.7%</td>
+                <td class="metric-good">70.5%</td>
             </tr>
 
             <tr>
                 <td><strong>Death Penalty</strong><br><small>1 = favor strongly, 4 = oppose strongly</small></td>
-                <td class="metric-medium">34.0%</td>
-                <td class="metric-medium">63.0%</td>
-                <td class="metric-medium">39.5%</td>
-                <td class="metric-good">72.0%</td>
+                <td class="metric-good">47.5%</td>
+                <td class="metric-good">80.1%</td>
+                <td class="metric-good">46.6%</td>
+                <td class="metric-good">85.2%</td>
             </tr>
 
             <tr>
                 <td><strong>Federal Crime Spending</strong><br><small>1 = increased a lot, 5 = decreased a lot</small></td>
-                <td class="metric-good">41.0%</td>
-                <td class="metric-good">77.0%</td>
-                <td class="metric-good">48.0%</td>
-                <td class="metric-good">75.0%</td>
+                <td class="metric-good">48.2%</td>
+                <td class="metric-good">92.2%</td>
+                <td class="metric-good">44.3%</td>
+                <td class="metric-good">89.2%</td>
             </tr>
 
             </table>
@@ -186,96 +186,8 @@
                 <strong>How to read:</strong> Blue bars = LLM predictions, Red bars = Actual responses.
                 Overlapping bars indicate accurate predictions.
             </p>
-            <div id="dist-charts" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; margin: 0 auto;"></div>
+            <img src="validation_individuals_distributions.png" alt="Response Distributions">
         </div>
-
-        <script>
-        (function() {
-            // Fetch the validation JSON and render distribution charts as inline SVG
-            fetch('../data/llm_validation_individuals.json')
-                .then(r => r.json())
-                .then(data => {
-                    const questions = {
-                        urban_unrest: { label: 'Urban Unrest Response', var: 'V241397', values: [1,2,3,4,5,6,7] },
-                        death_penalty: { label: 'Death Penalty', var: 'V241308x', values: [1,2,3,4] },
-                        crime_spending: { label: 'Federal Crime Spending', var: 'V241272x', values: [1,2,3,4,5] }
-                    };
-                    const models = [
-                        { key: 'ideology_only', label: 'Ideology Only' },
-                        { key: 'full_model', label: 'Ideology + Demographics' }
-                    ];
-                    const container = document.getElementById('dist-charts');
-
-                    for (const [qk, qinfo] of Object.entries(questions)) {
-                        for (const model of models) {
-                            const results = data.detailed_results[model.key];
-                            const predCounts = {};
-                            const actualCounts = {};
-                            qinfo.values.forEach(v => { predCounts[v] = 0; actualCounts[v] = 0; });
-
-                            results.forEach(r => {
-                                const p = Math.round(r.predictions[qk]);
-                                const a = Math.round(r.ground_truth[qinfo.var]);
-                                if (!isNaN(p)) predCounts[p] = (predCounts[p] || 0) + 1;
-                                if (!isNaN(a)) actualCounts[a] = (actualCounts[a] || 0) + 1;
-                            });
-
-                            const vals = qinfo.values;
-                            const maxCount = Math.max(...vals.map(v => Math.max(predCounts[v] || 0, actualCounts[v] || 0)), 1);
-                            const pq = data.models[model.key].per_question[qk];
-
-                            const svgW = 480, svgH = 280, padL = 45, padR = 15, padT = 55, padB = 40;
-                            const chartW = svgW - padL - padR;
-                            const chartH = svgH - padT - padB;
-                            const groupW = chartW / vals.length;
-                            const barW = groupW * 0.35;
-
-                            let bars = '';
-                            vals.forEach((v, i) => {
-                                const x = padL + i * groupW;
-                                const ph = (predCounts[v] / maxCount) * chartH;
-                                const ah = (actualCounts[v] / maxCount) * chartH;
-                                bars += `<rect x="${x + groupW*0.1}" y="${padT + chartH - ph}" width="${barW}" height="${ph}" fill="#3498db" opacity="0.85"/>`;
-                                bars += `<rect x="${x + groupW*0.1 + barW + 2}" y="${padT + chartH - ah}" width="${barW}" height="${ah}" fill="#e74c3c" opacity="0.85"/>`;
-                                bars += `<text x="${x + groupW/2}" y="${svgH - 15}" text-anchor="middle" font-size="12" fill="#333">${v}</text>`;
-                            });
-
-                            // Y-axis ticks
-                            let yAxis = '';
-                            const nTicks = 4;
-                            for (let t = 0; t <= nTicks; t++) {
-                                const val = Math.round(maxCount * t / nTicks);
-                                const y = padT + chartH - (t / nTicks) * chartH;
-                                yAxis += `<text x="${padL - 5}" y="${y + 4}" text-anchor="end" font-size="11" fill="#666">${val}</text>`;
-                                yAxis += `<line x1="${padL}" y1="${y}" x2="${svgW - padR}" y2="${y}" stroke="#ddd" stroke-width="1"/>`;
-                            }
-
-                            const svg = `<svg width="100%" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg" style="background:white; border-radius:8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-                                <text x="${svgW/2}" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">${qinfo.label}</text>
-                                <text x="${svgW/2}" y="35" text-anchor="middle" font-size="11" fill="#666">[${model.label}]</text>
-                                <rect x="${padL + 5}" y="${padT - 12}" width="95" height="38" rx="4" fill="wheat" opacity="0.8"/>
-                                <text x="${padL + 10}" y="${padT + 2}" font-size="10" font-weight="bold" fill="#333">Correct: ${pq.correct_pct.toFixed(1)}%</text>
-                                <text x="${padL + 10}" y="${padT + 16}" font-size="10" font-weight="bold" fill="#333">Within ±1: ${pq.within_1_pct.toFixed(1)}%</text>
-                                ${yAxis}
-                                ${bars}
-                                <text x="${svgW/2}" y="${svgH - 1}" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">Response Value</text>
-                                <rect x="${svgW - 170}" y="${padT - 10}" width="12" height="12" fill="#3498db" opacity="0.85"/>
-                                <text x="${svgW - 154}" y="${padT + 1}" font-size="10" fill="#333">LLM Predicted</text>
-                                <rect x="${svgW - 170}" y="${padT + 6}" width="12" height="12" fill="#e74c3c" opacity="0.85"/>
-                                <text x="${svgW - 154}" y="${padT + 17}" font-size="10" fill="#333">Actual</text>
-                            </svg>`;
-
-                            const div = document.createElement('div');
-                            div.innerHTML = svg;
-                            container.appendChild(div);
-                        }
-                    }
-                })
-                .catch(err => {
-                    document.getElementById('dist-charts').innerHTML = '<p style="color:red;">Error loading distribution data: ' + err.message + '</p>';
-                });
-        })();
-        </script>
 
         <h2>Interpretation</h2>
 
@@ -332,7 +244,7 @@
 
 DEMOGRAPHICS:
   - Gender: Woman
-  - Age in years: 61
+  - Age in years: -3
   - Education: Some college
   - Race/ethnicity: White NH
 
@@ -495,9 +407,9 @@ where X, Y, Z are integers on the scales indicated above.</div>
         Crime spending = 1</p>
 
         <p><strong>LLM prediction:</strong>
-        Urban unrest = 1.0,
-        Death penalty = 3.0,
-        Crime spending = 2.0</p>
+        Urban unrest = 4.0,
+        Death penalty = 2.0,
+        Crime spending = 3.0</p>
 
         <div class="footer">
             <p><strong>ANES 2024 Ideological Clusters Project</strong></p>
@@ -505,6 +417,5 @@ where X, Y, Z are integers on the scales indicated above.</div>
             <p><a href="../index.html">&larr; Back to Main Site</a></p>
         </div>
     </div>
-    <script data-goatcounter="https://guillelezama.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
