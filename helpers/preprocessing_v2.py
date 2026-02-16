@@ -361,7 +361,7 @@ VAR_LIKELY_VOTE = "V241029"         # 1=Definitely will vote, 2=Probably, 3=50-5
 VAR_REGION = "V243007"             # Census region: 1=Northeast, 2=Midwest, 3=South, 4=West
 VAR_GENDER = "V241551"             # 1=Man, 2=Woman, 3=Nonbinary, 4=Other
 VAR_SEX = "V241550"                # 1=Male, 2=Female (fallback)
-VAR_AGE = "V241458x"               # Age in years (80 = 80+)
+VAR_AGE = "V241455"                # Age in years
 VAR_EDU5 = "V241465x"              # Education 5-cat: 1=<HS, 2=HS, 3=Some college, 4=BA, 5=Grad
 VAR_RACEETH = "V241501x"           # Race/ethnicity
 
