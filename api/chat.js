@@ -49,19 +49,34 @@ export default async function handler(req, res) {
     // Build system prompt from persona stances
     const systemPrompt = buildSystemPrompt(persona);
 
-    // Call appropriate LLM provider (with fallback)
+    // Call appropriate LLM provider (with automatic fallback)
     let response, usage;
     const hasAnthropic = !!process.env.ANTHROPIC_API_KEY;
     const hasOpenAI = !!process.env.OPENAI_API_KEY;
 
-    if (provider === 'anthropic' && hasAnthropic) {
-      ({ response, usage } = await callAnthropic(systemPrompt, messages));
-    } else if (hasOpenAI) {
-      ({ response, usage } = await callOpenAI(systemPrompt, messages));
-    } else if (hasAnthropic) {
-      ({ response, usage } = await callAnthropic(systemPrompt, messages));
-    } else {
+    if (!hasAnthropic && !hasOpenAI) {
       return res.status(500).json({ error: 'No API key configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY in Vercel environment variables.' });
+    }
+
+    // Try preferred provider first, fall back to the other on failure
+    try {
+      if (provider === 'anthropic' && hasAnthropic) {
+        ({ response, usage } = await callAnthropic(systemPrompt, messages));
+      } else if (hasOpenAI) {
+        ({ response, usage } = await callOpenAI(systemPrompt, messages));
+      } else {
+        ({ response, usage } = await callAnthropic(systemPrompt, messages));
+      }
+    } catch (primaryError) {
+      console.warn(`Primary provider failed: ${primaryError.message}. Trying fallback...`);
+      // Fallback to the other provider
+      if (hasOpenAI && provider === 'anthropic') {
+        ({ response, usage } = await callOpenAI(systemPrompt, messages));
+      } else if (hasAnthropic && provider !== 'anthropic') {
+        ({ response, usage } = await callAnthropic(systemPrompt, messages));
+      } else {
+        throw primaryError; // No fallback available
+      }
     }
 
     return res.status(200).json({ response, usage });
