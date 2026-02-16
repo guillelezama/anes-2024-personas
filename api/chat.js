@@ -201,7 +201,7 @@ async function callAnthropic(systemPrompt, messages) {
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',  // Use Haiku 4.5 for cost efficiency
+      model: 'claude-sonnet-4-5-20250929',  // Sonnet 4.5 for better persona roleplay
       system: systemPrompt,
       messages: messages,
       max_tokens: 500,
