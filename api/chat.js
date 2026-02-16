@@ -49,12 +49,19 @@ export default async function handler(req, res) {
     // Build system prompt from persona stances
     const systemPrompt = buildSystemPrompt(persona);
 
-    // Call appropriate LLM provider
+    // Call appropriate LLM provider (with fallback)
     let response, usage;
-    if (provider === 'anthropic') {
+    const hasAnthropic = !!process.env.ANTHROPIC_API_KEY;
+    const hasOpenAI = !!process.env.OPENAI_API_KEY;
+
+    if (provider === 'anthropic' && hasAnthropic) {
+      ({ response, usage } = await callAnthropic(systemPrompt, messages));
+    } else if (hasOpenAI) {
+      ({ response, usage } = await callOpenAI(systemPrompt, messages));
+    } else if (hasAnthropic) {
       ({ response, usage } = await callAnthropic(systemPrompt, messages));
     } else {
-      ({ response, usage } = await callOpenAI(systemPrompt, messages));
+      return res.status(500).json({ error: 'No API key configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY in Vercel environment variables.' });
     }
 
     return res.status(200).json({ response, usage });
