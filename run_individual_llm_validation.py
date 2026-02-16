@@ -26,10 +26,10 @@ load_dotenv()
 
 # LLM imports
 try:
-    from langchain_openai import ChatOpenAI
+    from langchain_anthropic import ChatAnthropic
     from langchain_core.messages import SystemMessage, HumanMessage
 except ImportError:
-    print("ERROR: LangChain not installed. Run: pip install langchain-openai")
+    print("ERROR: LangChain not installed. Run: pip install langchain-anthropic")
     sys.exit(1)
 
 # Add helpers to path
@@ -191,12 +191,12 @@ def build_llm_prompt(features: Dict, respondent_id: int):
 
 def query_llm(prompt: str, api_key: str) -> Dict[str, float]:
     """
-    Query GPT-4o-mini to predict crime positions.
+    Query Claude Sonnet 4.5 to predict crime positions.
     """
     try:
-        llm = ChatOpenAI(
-            model="gpt-4o-mini",
-            openai_api_key=api_key,
+        llm = ChatAnthropic(
+            model="claude-sonnet-4-5-20250929",
+            anthropic_api_key=api_key,
             temperature=0
         )
 
@@ -339,10 +339,10 @@ def run_validation(sample_df: pd.DataFrame, api_key: str, include_demographics: 
 
 def main():
     # Get API key
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("ANTHROPIC_API_KEY")
     if not api_key:
-        print("\nERROR: OPENAI_API_KEY not set in environment")
-        print("Run: export OPENAI_API_KEY='sk-...'")
+        print("\nERROR: ANTHROPIC_API_KEY not set in environment")
+        print("Run: export ANTHROPIC_API_KEY='sk-ant-...'")
         sys.exit(1)
 
     print("="*70)
