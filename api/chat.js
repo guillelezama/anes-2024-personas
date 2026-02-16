@@ -69,6 +69,7 @@ export default async function handler(req, res) {
       }
     } catch (primaryError) {
       console.warn(`Primary provider failed: ${primaryError.message}. Trying fallback...`);
+      const fallbackNote = `[Fallback: ${primaryError.message}]`;
       // Fallback to the other provider
       if (hasOpenAI && provider === 'anthropic') {
         ({ response, usage } = await callOpenAI(systemPrompt, messages));
@@ -77,9 +78,10 @@ export default async function handler(req, res) {
       } else {
         throw primaryError; // No fallback available
       }
+      return res.status(200).json({ response, usage, fallback: fallbackNote });
     }
 
-    return res.status(200).json({ response, usage });
+    return res.status(200).json({ response, usage, provider: provider });
 
   } catch (error) {
     console.error('Chat API error:', error);
