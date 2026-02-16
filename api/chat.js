@@ -36,7 +36,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { messages, persona, provider = 'openai' } = req.body;
+    const { messages, persona, provider = 'anthropic' } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Invalid messages format' });

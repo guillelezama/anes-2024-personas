@@ -61,7 +61,7 @@ def chat():
         data = request.json
         messages = data.get('messages', [])
         persona = data.get('persona', {})
-        provider = data.get('provider', 'openai')
+        provider = data.get('provider', 'anthropic')
 
         # Build system prompt from persona
         system_prompt = build_persona_system_prompt(persona)

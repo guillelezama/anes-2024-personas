@@ -843,7 +843,7 @@
                         { role: 'user', content: userMessage }
                     ],
                     persona: persona,
-                    provider: 'openai'  // or 'anthropic'
+                    provider: 'anthropic'
                 })
             });
 
