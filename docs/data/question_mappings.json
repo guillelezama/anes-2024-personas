@@ -47,7 +47,7 @@
     "V241281x": "(Should federal spending on aid to the poor be increased, decreased, or kept the same?) (1 = Increased a lot, 5 = Decreased a lot)",
     "V241403x": "Do you favor, oppose, or neither favor nor oppose the United States giving military assistance to Israel? (1 = Favor a great deal, 7 = Oppose a great deal)",
     "V241406x": "Do you favor or oppose, or neither favor nor oppose the United States providing humanitarian assistance to Palestinians in the Gaza Strip? (1 = Favor a great deal, 7 = Oppose a great deal)",
-    "V241409x": "n the Middle East conflict, do you side more with [the Israelis, the Palestinians/the Palestinians, the Israelis], both equally, or neither? (1 = Side a lot with Israelis, 7 = Side a lot with Palestinians)",
+    "V241409x": "In the Middle East conflict, do you side more with the Israelis or the Palestinians? (1 = Side a lot with Israelis, 7 = Side a lot with Palestinians)",
     "V241412x": "Do you approve, disapprove, or neither approve nor disapprove of the protests on college campuses against the war in Gaza? (1 = Approve a lot of protests, 7 = Disapprove a lot of protests)"
   },
   "axis_labels": {

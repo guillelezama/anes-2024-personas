@@ -2,35 +2,35 @@
   "tours": [
     {
       "id": "main_tour",
-      "title": "Welcome to ANES 2024 Ideological Clusters",
+      "title": "Welcome to American Voter Personas 2024",
       "steps": [
         {
           "title": "Welcome!",
-          "content": "This interactive site reveals 15 distinct ideological clusters among likely voters in the 2024 election. Discover where you fit and explore the political landscape.",
+          "content": "In this website you can:\n\n1) See the clusters' positions across 51 questions from ANES 2024\n2) Respond a 10-question quiz and see which cluster fits you more\n3) Talk to AI-generated personas from each cluster and ask them any question about politics\n\nAll the methodology and code is available.",
           "placement": "center"
         },
         {
           "target": "#explore-tab",
-          "title": "Explore the Landscape",
-          "content": "View clusters in 3D and 2D. Each point represents an ideological cluster—hover to see demographics, vote shares, and policy positions. Point size shows prevalence; color shows Party ID (red = Republican, blue = Democrat).",
+          "title": "Explore the Clusters",
+          "content": "View 15 ideological clusters in 3D and 2D. Hover over each cluster to see demographics, vote shares, and policy positions.",
           "placement": "bottom"
         },
         {
           "target": "#quiz-tab",
-          "title": "Find Your Cluster",
+          "title": "Respond a Quiz and Find Your Cluster",
           "content": "Answer 10 questions to discover which cluster you belong to.",
           "placement": "bottom"
         },
         {
           "target": "#persona-tab",
-          "title": "Chat with Personas",
-          "content": "Each cluster is represented by a simulated persona based on real survey data. Ask them about political issues and see how different ideological groups think.",
+          "title": "Chat with an AI-Generated Voter Persona",
+          "content": "Each cluster is represented by a simulated persona based on real survey data. Ask them about political issues and see how different ideological groups respond.",
           "placement": "bottom"
         },
         {
           "target": "#about-tab",
-          "title": "About",
-          "content": "In the About tab, I describe the methodology and provide links to technical documentation.",
+          "title": "Methodology and Validation",
+          "content": "Learn about the clustering methodology, LLM validation experiments, and access the full technical documentation and code.",
           "placement": "bottom"
         }
       ]
