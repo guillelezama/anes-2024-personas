@@ -5,8 +5,8 @@
       "title": "Welcome to AI Voter Personas: US 2024",
       "steps": [
         {
-          "title": "Welcome!",
-          "content": "In this website you can:\n\n1) See the clusters' positions across 51 questions from ANES 2024\n2) Respond a 10-question quiz and see which cluster fits you more\n3) Talk to AI-generated personas from each cluster and ask them any question about politics\n\nAll the methodology and code is available.",
+          "title": "In this website you can: 1) See the clusters' positions across 51 questions from ANES 2024. 2) Respond a 10-question quiz and see which cluster fits you more. 3) Have a conversation with AI-generated personas from each cluster about politics.",
+          "content": "All the methodology and code is available.",
           "placement": "center"
         },
         {
