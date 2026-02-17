@@ -6,31 +6,31 @@
       "steps": [
         {
           "title": "Welcome!",
-          "content": "In this website you can:\n\n1) See the clusters' positions across 51 questions from ANES 2024.\n\n2) Respond a 10-question quiz and see which cluster fits you more.\n\n3) Have a conversation with AI-generated personas from each cluster about politics.\n\nAll the methodology and code is available.",
+          "content": "In this website you can:\n\n1) See the clusters' positions across 51 questions from ANES 2024\n\n2) Respond a 10-question quiz and see which cluster fits you more\n\n3) Talk to AI-generated personas from each cluster and ask them any question about politics\n\nAll the methodology and code is available.",
           "placement": "center"
         },
         {
           "target": "#explore-tab",
           "title": "Explore the Clusters",
-          "content": "View 15 ideological clusters in 3D and 2D. Hover over each cluster to see demographics, vote shares, and policy positions.",
+          "content": "Discover how 15 distinct voter groups position themselves across the political landscape. Toggle between 3D and 2D views, select policy dimensions to compare, and hover over clusters to see their demographics and vote shares.",
           "placement": "bottom"
         },
         {
           "target": "#quiz-tab",
           "title": "Respond a Quiz and Find Your Cluster",
-          "content": "Answer 10 questions to discover which cluster you belong to.",
+          "content": "Answer 10 questions and discover which ideological cluster best matches your views.",
           "placement": "bottom"
         },
         {
           "target": "#persona-tab",
           "title": "Chat with an AI-Generated Voter Persona",
-          "content": "Each cluster is represented by a simulated persona based on real survey data. Ask them about political issues and see how different ideological groups respond.",
+          "content": "Each cluster has a simulated persona based on real survey data. Ask them about political issues and see how different ideological groups respond.",
           "placement": "bottom"
         },
         {
           "target": "#about-tab",
           "title": "Methodology and Validation",
-          "content": "Learn about the clustering methodology, LLM validation experiments, and access the full technical documentation and code.",
+          "content": "Learn about the clustering methodology, LLM validation experiments, and access the full code and technical documentation.",
           "placement": "bottom"
         }
       ]
