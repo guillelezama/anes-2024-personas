@@ -237,6 +237,235 @@ Remember: You are this actual person. Speak naturally and give clear opinions. F
     return prompt
 
 
+@app.route('/api/deliberate', methods=['POST'])
+def deliberate():
+    """
+    Orchestrate a 4-phase deliberation between 2-3 voter personas.
+
+    Request body:
+    {
+        "topic": "...",
+        "personas": [{name, stances, cluster, ...}, ...]
+    }
+    Response:
+    {
+        "transcript": [{"phase", "speaker", "personaId", "text"}, ...],
+        "summary": {"agreements", "disagreements", "assumptions", "evidenceToChange"}
+    }
+    """
+    try:
+        data = request.json
+        topic = (data.get('topic') or '').strip()
+        personas = data.get('personas', [])
+
+        if not topic:
+            return jsonify({'error': 'topic is required'}), 400
+        if not isinstance(personas, list) or len(personas) < 2 or len(personas) > 3:
+            return jsonify({'error': 'personas must be a list of 2 or 3 persona objects'}), 400
+        for p in personas:
+            if not p.get('name') or not p.get('stances'):
+                return jsonify({'error': 'Each persona must have name and stances fields'}), 400
+
+        if ANTHROPIC_API_KEY:
+            def make_llm(temp):
+                return ChatAnthropic(
+                    model="claude-sonnet-4-5-20250929",
+                    anthropic_api_key=ANTHROPIC_API_KEY,
+                    temperature=temp
+                )
+        elif OPENAI_API_KEY:
+            def make_llm(temp):
+                return ChatOpenAI(
+                    model="gpt-4o-mini",
+                    openai_api_key=OPENAI_API_KEY,
+                    temperature=temp
+                )
+        else:
+            return jsonify({'error': 'No API key configured'}), 500
+
+        transcript = []
+
+        # Phase 1: Positions
+        for persona in personas:
+            system = build_deliberation_persona_prompt(persona)
+            prompt = deliberation_position_prompt(topic)
+            text = deliberation_llm_call(make_llm(0.7), system, prompt)
+            transcript.append({'phase': 'positions', 'speaker': persona['name'],
+                                'personaId': str(persona.get('cluster', '')), 'text': text})
+
+        # Phase 2: Challenges (each critiques the next, rotating)
+        for i, speaker in enumerate(personas):
+            target = personas[(i + 1) % len(personas)]
+            target_stmt = next(
+                (t['text'] for t in transcript if t['speaker'] == target['name'] and t['phase'] == 'positions'), ''
+            )
+            system = build_deliberation_persona_prompt(speaker)
+            prompt = deliberation_challenge_prompt(topic, target['name'], target_stmt)
+            text = deliberation_llm_call(make_llm(0.7), system, prompt)
+            transcript.append({'phase': 'challenges', 'speaker': speaker['name'],
+                                'personaId': str(speaker.get('cluster', '')), 'text': text})
+
+        # Phase 3: Compromise
+        debate_so_far = deliberation_format_transcript(transcript)
+        for persona in personas:
+            system = build_deliberation_persona_prompt(persona)
+            prompt = deliberation_compromise_prompt(topic, debate_so_far)
+            text = deliberation_llm_call(make_llm(0.7), system, prompt)
+            transcript.append({'phase': 'compromise', 'speaker': persona['name'],
+                                'personaId': str(persona.get('cluster', '')), 'text': text})
+
+        # Phase 4: Mediator
+        full_transcript = deliberation_format_transcript(transcript)
+        names = ', '.join(p['name'] for p in personas)
+        joint_statement, summary = deliberation_mediator_call(make_llm(0), topic, names, full_transcript)
+        transcript.append({'phase': 'joint', 'speaker': 'Mediator', 'text': joint_statement})
+
+        return jsonify({'transcript': transcript, 'summary': summary})
+
+    except Exception as e:
+        print(f"Error in deliberate endpoint: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+# ---------------------------------------------------------------------------
+# Deliberation helpers
+# ---------------------------------------------------------------------------
+
+def build_deliberation_persona_prompt(persona):
+    name = persona.get('name', 'Voter')
+    stances = persona.get('stances', {})
+
+    prompt = f"You are {name}, an American voter taking part in a structured political deliberation.\n\n"
+    prompt += "YOUR POLICY POSITIONS:\n"
+    for key, stance in stances.items():
+        readable = get_readable_name(key)
+        value = stance.get('value')
+        line = f"- {readable}: {stance.get('decisive_stance', '')}"
+        if value is not None:
+            line += f" (value: {value:.1f})"
+        prompt += line + "\n"
+
+    prompt += "\nRULES:\n"
+    prompt += "- Speak only in first person as this voter. Never mention surveys, data, clusters, scales, or AI.\n"
+    prompt += "- Do not invent statistics or cite specific studies. Speak from lived experience and values.\n"
+    prompt += "- Be direct and honest. Point out real tradeoffs and acknowledge genuine uncertainty.\n"
+    prompt += "- Do not soften your disagreements artificially or add 'I respect that' unless it follows from your actual positions.\n"
+    prompt += "- Do not use 'both sides' framing unless your positions are genuinely mixed on this topic.\n"
+    prompt += "- Stay under 120 words.\n"
+    return prompt
+
+
+def deliberation_position_prompt(topic):
+    return f"""The topic is: "{topic}"
+
+State your position in four parts:
+1. My position: (one clear sentence)
+2. Why people like me think this: (one or two sentences grounded in your values and experience)
+3. My biggest concern: (one sentence)
+4. What would change my mind: (be honest -- one sentence)
+
+Stay under 120 words total."""
+
+
+def deliberation_challenge_prompt(topic, target_name, target_statement):
+    return f"""The topic is: "{topic}"
+
+{target_name} said:
+"{target_statement}"
+
+Respond directly to what {target_name} said. Identify the part you find weakest or most wrong and explain why from your own values and experience. Do not agree for the sake of politeness. Note any tradeoffs or uncertainties you think they are ignoring. Stay under 120 words."""
+
+
+def deliberation_compromise_prompt(topic, debate_so_far):
+    return f"""The topic is: "{topic}"
+
+Here is the debate so far:
+{debate_so_far}
+
+Now propose a compromise in two parts:
+1. A version I could live with: (a concrete policy or outcome you could accept, even if not ideal)
+2. My red line: (the one thing that would make any deal unacceptable to you)
+
+Be honest. Do not pretend to agree more than you actually do. Stay under 120 words."""
+
+
+def deliberation_mediator_call(llm, topic, names, full_transcript):
+    import json as json_lib
+    system = (
+        "You are an impartial political science mediator. Your job is to analyze a structured deliberation "
+        "and produce a fair, accurate synthesis. Do not favor any participant. Do not invent facts or "
+        "statistics. Identify real agreements, real disagreements, and the underlying values driving "
+        "differences. Use plain language."
+    )
+    user = f"""Topic: "{topic}"
+Participants: {names}
+
+Full deliberation transcript:
+{full_transcript}
+
+Produce a synthesis as valid JSON with exactly this structure:
+{{
+  "jointStatement": ["bullet 1", "bullet 2", "bullet 3"],
+  "agreements": ["..."],
+  "disagreements": ["..."],
+  "assumptions": ["..."],
+  "evidenceToChange": ["..."]
+}}
+
+Rules:
+- jointStatement: 3 to 6 bullets. Each under 30 words. Identify genuine shared ground and shared facts. Total under 180 words.
+- agreements: 2 to 5 bullets of genuine shared positions or shared concerns.
+- disagreements: 2 to 5 bullets of unresolved differences that persist after the compromise phase.
+- assumptions: 2 to 5 bullets naming the core values or empirical assumptions driving disagreement.
+- evidenceToChange: one item per participant by name describing what kind of evidence would realistically shift their position.
+
+Return only the JSON object. No text before or after."""
+
+    from langchain_core.messages import SystemMessage, HumanMessage
+    raw = llm.invoke([SystemMessage(content=system), HumanMessage(content=user)]).content
+
+    try:
+        cleaned = raw.strip()
+        if cleaned.startswith('```'):
+            cleaned = cleaned.split('\n', 1)[1] if '\n' in cleaned else cleaned
+            cleaned = cleaned.rsplit('```', 1)[0].strip()
+        parsed = json_lib.loads(cleaned)
+        joint = '\n'.join(f"- {b}" for b in (parsed.get('jointStatement') or []))
+        summary = {
+            'agreements': parsed.get('agreements', []),
+            'disagreements': parsed.get('disagreements', []),
+            'assumptions': parsed.get('assumptions', []),
+            'evidenceToChange': parsed.get('evidenceToChange', [])
+        }
+        return joint, summary
+    except Exception:
+        return (
+            '(Joint statement could not be generated. Please try again.)',
+            {'agreements': ['Summary generation failed. Please try again.'],
+             'disagreements': [], 'assumptions': [], 'evidenceToChange': []}
+        )
+
+
+def deliberation_llm_call(llm, system_prompt, user_prompt):
+    from langchain_core.messages import SystemMessage, HumanMessage
+    response = llm.invoke([SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)])
+    return response.content
+
+
+def deliberation_format_transcript(transcript):
+    return '\n\n'.join(
+        f"[{t['phase'].upper()}] {t['speaker']}: {t['text']}"
+        for t in transcript
+    )
+
+
+def deliberation_trim(text, limit):
+    words = text.strip().split()
+    if len(words) <= limit:
+        return text.strip()
+    return ' '.join(words[:limit]) + '...'
+
+
 if __name__ == '__main__':
     print("\n" + "="*60)
     print("ANES 2024 Persona Chat Server")

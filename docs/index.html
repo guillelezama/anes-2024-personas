@@ -47,6 +47,9 @@
             <button class="tab-btn" data-tab="persona" id="persona-tab">
                 <span class="tab-icon">💬</span> Persona Chat
             </button>
+            <button class="tab-btn" data-tab="deliberation" id="deliberation-tab">
+                <span class="tab-icon">🗣️</span> Deliberation (beta)
+            </button>
             <button class="tab-btn" data-tab="about" id="about-tab">
                 <span class="tab-icon">ℹ️</span> About
             </button>
@@ -62,7 +65,7 @@
 
             <div class="viz-explanation">
                 <p>
-                    Discover how <strong>15 distinct voter groups</strong> position themselves across the political landscape. Based on 51 policy questions from the ANES 2024 survey, these clusters reveal the ideological diversity behind the Trump vs Harris election.
+                    Discover how <strong>15 distinct voter groups</strong> position themselves across the political landscape. Based on 51 policy questions from the ANES 2024 survey, these clusters reveal the ideological diversity behind the Trump vs Harris election. You can also chat with AI personas from each cluster, take a quiz to find your own cluster, and watch personas from different clusters <strong>deliberate</strong> on any political topic in a structured AI debate.
                 </p>
                 <p>
                     Toggle between 3D and 2D views, select policy dimensions to compare, and hover over clusters to see their demographics and vote shares.
@@ -168,6 +171,120 @@
             </div>
         </section>
 
+        <!-- TAB: DELIBERATION -->
+        <section id="deliberation-content" class="tab-content">
+            <h2>Deliberation</h2>
+            <div class="viz-explanation">
+                <p>Select 2 or 3 voter personas and enter a topic. The personas will debate their differences across four structured phases, then a mediator will identify agreements, disagreements, and common ground.</p>
+                <p>Each response is grounded in the persona's stored survey positions. No statistics are invented.</p>
+            </div>
+
+            <!-- Setup -->
+            <div class="deliberation-setup">
+                <div class="deliberation-field">
+                    <label for="deliberation-topic-input" class="deliberation-label">Topic or question</label>
+                    <input type="text" id="deliberation-topic-input" class="deliberation-topic-input"
+                        placeholder="e.g. Should the US send more weapons to Ukraine?" maxlength="200">
+                </div>
+
+                <div class="deliberation-field">
+                    <label class="deliberation-label">
+                        Select 2 or 3 personas
+                        <span id="deliberation-persona-count" class="deliberation-count-badge">0 selected</span>
+                    </label>
+                    <div id="deliberation-persona-checkboxes" class="deliberation-persona-checkboxes">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <button id="deliberation-run-btn" class="btn btn-primary btn-large" disabled>
+                    Run Deliberation
+                </button>
+            </div>
+
+            <!-- Loading -->
+            <div id="deliberation-loading" class="deliberation-loading hidden">
+                <div class="deliberation-spinner"></div>
+                <p class="deliberation-loading-text">Running deliberation... This takes 30 to 60 seconds.</p>
+                <div class="deliberation-phase-steps">
+                    <span class="phase-step">Positions</span>
+                    <span class="phase-step-arrow">&#8594;</span>
+                    <span class="phase-step">Challenges</span>
+                    <span class="phase-step-arrow">&#8594;</span>
+                    <span class="phase-step">Compromise</span>
+                    <span class="phase-step-arrow">&#8594;</span>
+                    <span class="phase-step">Joint Statement</span>
+                </div>
+            </div>
+
+            <!-- Error -->
+            <div id="deliberation-error" class="deliberation-error hidden">
+                <p id="deliberation-error-text">An error occurred. Please try again.</p>
+            </div>
+
+            <!-- Results -->
+            <div id="deliberation-results" class="deliberation-results hidden">
+
+                <!-- Summary (shown first) -->
+                <div class="deliberation-panel">
+                    <div class="deliberation-panel-header">
+                        <h3>Summary</h3>
+                        <button id="copy-summary-btn" class="btn btn-outline">Copy Summary</button>
+                    </div>
+                    <div class="deliberation-summary-grid">
+                        <div class="deliberation-summary-card">
+                            <h4>Agreements</h4>
+                            <ul id="summary-agreements"></ul>
+                        </div>
+                        <div class="deliberation-summary-card">
+                            <h4>Remaining Disagreements</h4>
+                            <ul id="summary-disagreements"></ul>
+                        </div>
+                        <div class="deliberation-summary-card">
+                            <h4>Values and Assumptions Driving Differences</h4>
+                            <ul id="summary-assumptions"></ul>
+                        </div>
+                        <div class="deliberation-summary-card">
+                            <h4>Evidence That Would Change Minds</h4>
+                            <ul id="summary-evidence"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Joint Statement -->
+                <div class="deliberation-panel">
+                    <div class="deliberation-panel-header">
+                        <h3>Joint Statement</h3>
+                    </div>
+                    <div id="messages-joint" class="deliberation-messages"></div>
+                </div>
+
+                <!-- Transcript (shown below) -->
+                <div class="deliberation-panel">
+                    <div class="deliberation-panel-header">
+                        <h3>Full Transcript</h3>
+                        <button id="copy-transcript-btn" class="btn btn-outline">Copy Transcript</button>
+                    </div>
+
+                    <div class="deliberation-phase-block">
+                        <h4 class="deliberation-phase-title">Phase 1: Positions</h4>
+                        <div id="messages-positions" class="deliberation-messages"></div>
+                    </div>
+
+                    <div class="deliberation-phase-block">
+                        <h4 class="deliberation-phase-title">Phase 2: Challenges</h4>
+                        <div id="messages-challenges" class="deliberation-messages"></div>
+                    </div>
+
+                    <div class="deliberation-phase-block">
+                        <h4 class="deliberation-phase-title">Phase 3: Compromise Proposals</h4>
+                        <div id="messages-compromise" class="deliberation-messages"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
         <!-- TAB 5: ABOUT -->
         <section id="about-content" class="tab-content">
             <h2>About This Project</h2>
@@ -186,6 +303,9 @@
                     discovers natural groupings based on actual policy combinations. Some clusters align
                     closely with traditional party platforms; others represent cross-cutting coalitions
                     that defy conventional labels.
+                </p>
+                <p>
+                    The site also includes a <strong>Deliberation (beta)</strong> feature: select any two or three personas and a political topic, and an AI-orchestrated structured debate runs automatically — positions, mutual challenges, compromise proposals, and a mediator synthesis. Every argument is grounded in each persona's actual survey stances, not invented opinions.
                 </p>
             </div>
 

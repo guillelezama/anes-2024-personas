@@ -6,7 +6,7 @@
       "steps": [
         {
           "title": "Welcome!",
-          "content": "In this website you can: 1) See the clusters' positions across 51 questions from ANES 2024. 2) Respond a 10-question quiz and see which cluster fits you more. 3) Talk to AI-generated personas from each cluster and ask them any question about politics. All the methodology and code is available.",
+          "content": "In this website you can: 1) See the clusters' positions across 51 questions from ANES 2024. 2) Respond a 10-question quiz and see which cluster fits you more. 3) Talk to AI-generated personas from each cluster and ask them any question about politics. 4) Watch AI personas from different clusters deliberate on any political topic in a structured debate. All the methodology and code is available.",
           "placement": "center"
         },
         {
@@ -25,6 +25,12 @@
           "target": "#persona-tab",
           "title": "Chat",
           "content": "Chat with an AI-Generated Voter Persona: Each cluster has a simulated persona based on real survey data. Ask them about political issues and see how different ideological groups respond.",
+          "placement": "bottom"
+        },
+        {
+          "target": "#deliberation-tab",
+          "title": "Deliberation (beta)",
+          "content": "Structured AI Debate: Pick any two or three personas and a political topic. The personas argue their positions, challenge each other, propose compromises, and a mediator synthesizes agreements and disagreements grounded in each persona's real survey data.",
           "placement": "bottom"
         },
         {

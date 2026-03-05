@@ -25,7 +25,8 @@
         currentStoryStep: 0,
         currentPersona: null,
         quizAnswers: {},
-        chatHistory: []
+        chatHistory: [],
+        deliberationRunning: false
     };
 
     // Full question text for each dimension (from ANES 2024 survey)
@@ -94,6 +95,7 @@
         setupQuizTab();
         // setupStoryTab(); // Removed - Story Mode tab no longer exists
         setupPersonaTab();
+        setupDeliberationTab();
         setupDistributionListeners();
         setupWelcomeTour();
         trackEvent('page_load', { universe: STATE.metadata.analysis_universe });
@@ -1030,6 +1032,207 @@
                     updateClusterDistributions(cluster);
                 }
             });
+        });
+    }
+
+    // ========================================================================
+    // DELIBERATION TAB
+    // ========================================================================
+
+    function setupDeliberationTab() {
+        const topicInput = document.getElementById('deliberation-topic-input');
+        const checkboxContainer = document.getElementById('deliberation-persona-checkboxes');
+        const countBadge = document.getElementById('deliberation-persona-count');
+        const runBtn = document.getElementById('deliberation-run-btn');
+        const loadingDiv = document.getElementById('deliberation-loading');
+        const resultsDiv = document.getElementById('deliberation-results');
+        const errorDiv = document.getElementById('deliberation-error');
+
+        // Populate persona checkboxes; default first, median, last checked
+        const personaEntries = Object.entries(STATE.avatars);
+        const n = personaEntries.length;
+        const defaultIndices = new Set([0, Math.floor((n - 1) / 2), n - 1]);
+        personaEntries.forEach(([clusterId, persona], idx) => {
+            const label = document.createElement('label');
+            label.className = 'deliberation-persona-label';
+
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = clusterId;
+            cb.className = 'deliberation-persona-cb';
+            if (defaultIndices.has(idx)) cb.checked = true;
+
+            label.appendChild(cb);
+            label.appendChild(document.createTextNode(' ' + persona.name + ' (Cluster ' + clusterId + ')'));
+            checkboxContainer.appendChild(label);
+        });
+
+        function getSelectedPersonas() {
+            return Array.from(document.querySelectorAll('.deliberation-persona-cb:checked'))
+                .map(cb => STATE.avatars[cb.value]);
+        }
+
+        function refreshRunBtn() {
+            const selected = getSelectedPersonas();
+            const topic = topicInput.value.trim();
+            countBadge.textContent = selected.length + ' selected';
+            runBtn.disabled = selected.length < 2 || selected.length > 3 || !topic || STATE.deliberationRunning;
+        }
+
+        document.querySelectorAll('.deliberation-persona-cb').forEach(cb => {
+            cb.addEventListener('change', refreshRunBtn);
+        });
+        topicInput.addEventListener('input', refreshRunBtn);
+        refreshRunBtn();
+
+        runBtn.addEventListener('click', async () => {
+            const topic = topicInput.value.trim();
+            const personas = getSelectedPersonas();
+            if (!topic || personas.length < 2 || personas.length > 3 || STATE.deliberationRunning) return;
+
+            STATE.deliberationRunning = true;
+            resultsDiv.classList.add('hidden');
+            errorDiv.classList.add('hidden');
+            loadingDiv.classList.remove('hidden');
+            runBtn.disabled = true;
+
+            trackEvent('deliberation_started', { persona_count: personas.length });
+
+            try {
+                const resp = await fetch('/api/deliberate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic, personas })
+                });
+
+                if (!resp.ok) {
+                    const err = await resp.json().catch(() => ({}));
+                    throw new Error(err.error || 'Request failed with status ' + resp.status);
+                }
+
+                const data = await resp.json();
+                renderDeliberation(data.transcript, data.summary);
+                loadingDiv.classList.add('hidden');
+                resultsDiv.classList.remove('hidden');
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                trackEvent('deliberation_completed', { persona_count: personas.length });
+
+            } catch (err) {
+                loadingDiv.classList.add('hidden');
+                errorDiv.classList.remove('hidden');
+                document.getElementById('deliberation-error-text').textContent = 'Error: ' + err.message;
+                trackEvent('deliberation_error', { message: err.message });
+            } finally {
+                STATE.deliberationRunning = false;
+                refreshRunBtn();
+            }
+        });
+
+        function markdownToHtml(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/^(\d+\.\s)/gm, '<br><strong>$1</strong>')
+                .replace(/\n/g, '<br>')
+                .replace(/^<br>/, '');
+        }
+
+        function renderDeliberation(transcript, summary) {
+            ['positions', 'challenges', 'compromise', 'joint'].forEach(phase => {
+                const container = document.getElementById('messages-' + phase);
+                container.innerHTML = '';
+                const isJoint = phase === 'joint';
+                transcript.filter(t => t.phase === phase).forEach(msg => {
+                    const item = document.createElement('div');
+                    item.className = 'deliberation-msg' + (msg.speaker === 'Mediator' ? ' mediator' : ' persona');
+
+                    const header = document.createElement('div');
+                    header.className = 'deliberation-msg-header';
+
+                    const speaker = document.createElement('strong');
+                    speaker.className = 'deliberation-speaker';
+                    speaker.textContent = msg.speaker;
+                    header.appendChild(speaker);
+
+                    const body = document.createElement('div');
+                    body.className = 'deliberation-msg-text';
+                    body.innerHTML = markdownToHtml(msg.text);
+
+                    if (!isJoint) {
+                        body.classList.add('collapsed');
+                        const toggle = document.createElement('span');
+                        toggle.className = 'deliberation-toggle';
+                        toggle.textContent = 'Read more';
+                        header.appendChild(toggle);
+                        header.style.cursor = 'pointer';
+                        header.addEventListener('click', () => {
+                            const isCollapsed = body.classList.toggle('collapsed');
+                            toggle.textContent = isCollapsed ? 'Read more' : 'Collapse';
+                        });
+                    }
+
+                    item.appendChild(header);
+                    item.appendChild(body);
+                    container.appendChild(item);
+                });
+            });
+
+            renderSummaryList('summary-agreements', summary.agreements);
+            renderSummaryList('summary-disagreements', summary.disagreements);
+            renderSummaryList('summary-assumptions', summary.assumptions);
+            renderSummaryList('summary-evidence', summary.evidenceToChange);
+        }
+
+        function renderSummaryList(id, items) {
+            const ul = document.getElementById(id);
+            ul.innerHTML = '';
+            (items || []).forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                ul.appendChild(li);
+            });
+        }
+
+        document.getElementById('copy-transcript-btn').addEventListener('click', () => {
+            const lines = [];
+            document.querySelectorAll('.deliberation-phase-block').forEach(block => {
+                const title = block.querySelector('.deliberation-phase-title')?.textContent || '';
+                lines.push(title);
+                block.querySelectorAll('.deliberation-msg').forEach(msg => {
+                    const name = msg.querySelector('.deliberation-speaker')?.textContent || '';
+                    const text = msg.querySelector('.deliberation-msg-text')?.innerText || '';
+                    lines.push(name + ': ' + text);
+                });
+                lines.push('');
+            });
+            navigator.clipboard.writeText(lines.join('\n').trim()).catch(() => {});
+            const btn = document.getElementById('copy-transcript-btn');
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = 'Copy Transcript'; }, 2000);
+        });
+
+        document.getElementById('copy-summary-btn').addEventListener('click', () => {
+            const sections = [
+                { title: 'Agreements', id: 'summary-agreements' },
+                { title: 'Remaining Disagreements', id: 'summary-disagreements' },
+                { title: 'Values and Assumptions', id: 'summary-assumptions' },
+                { title: 'Evidence to Change Minds', id: 'summary-evidence' }
+            ];
+            let text = '';
+            sections.forEach(s => {
+                text += s.title + ':\n';
+                document.querySelectorAll('#' + s.id + ' li').forEach(li => {
+                    text += '- ' + li.textContent + '\n';
+                });
+                text += '\n';
+            });
+            navigator.clipboard.writeText(text.trim()).catch(() => {});
+            const btn = document.getElementById('copy-summary-btn');
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = 'Copy Summary'; }, 2000);
         });
     }
 
