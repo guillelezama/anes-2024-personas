@@ -180,7 +180,7 @@ Return only the JSON object. No text before or after.`;
 async function callMediator(topic, names, fullTranscript) {
   const systemPrompt = buildMediatorSystem();
   const userPrompt = buildMediatorPrompt(topic, names, fullTranscript);
-  const raw = await callLLM(systemPrompt, [{ role: 'user', content: userPrompt }], 0);
+  const raw = await callLLM(systemPrompt, [{ role: 'user', content: userPrompt }], 0, 1500);
   return parseMediatorOutput(raw);
 }
 
@@ -190,10 +190,10 @@ async function callMediator(topic, names, fullTranscript) {
 
 async function callPersona(persona, userPrompt) {
   const systemPrompt = buildPersonaSystem(persona);
-  return await callLLM(systemPrompt, [{ role: 'user', content: userPrompt }], 0.7);
+  return await callLLM(systemPrompt, [{ role: 'user', content: userPrompt }], 0.7, 600);
 }
 
-async function callLLM(systemPrompt, messages, temperature = 0.7) {
+async function callLLM(systemPrompt, messages, temperature = 0.7, maxTokens = 600) {
   const hasAnthropic = !!process.env.ANTHROPIC_API_KEY;
   const hasOpenAI = !!process.env.OPENAI_API_KEY;
 
@@ -202,18 +202,18 @@ async function callLLM(systemPrompt, messages, temperature = 0.7) {
   }
 
   try {
-    if (hasAnthropic) return await callAnthropic(systemPrompt, messages, temperature);
-    return await callOpenAI(systemPrompt, messages, temperature);
+    if (hasAnthropic) return await callAnthropic(systemPrompt, messages, temperature, maxTokens);
+    return await callOpenAI(systemPrompt, messages, temperature, maxTokens);
   } catch (primaryError) {
     if (hasAnthropic && hasOpenAI) {
       console.warn(`Primary provider failed: ${primaryError.message}. Trying fallback...`);
-      return await callOpenAI(systemPrompt, messages, temperature);
+      return await callOpenAI(systemPrompt, messages, temperature, maxTokens);
     }
     throw primaryError;
   }
 }
 
-async function callAnthropic(systemPrompt, messages, temperature) {
+async function callAnthropic(systemPrompt, messages, temperature, maxTokens) {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -225,7 +225,7 @@ async function callAnthropic(systemPrompt, messages, temperature) {
       model: 'claude-sonnet-4-5-20250929',
       system: systemPrompt,
       messages,
-      max_tokens: 600,
+      max_tokens: maxTokens,
       temperature
     })
   });
@@ -238,7 +238,7 @@ async function callAnthropic(systemPrompt, messages, temperature) {
   return data.content[0].text;
 }
 
-async function callOpenAI(systemPrompt, messages, temperature) {
+async function callOpenAI(systemPrompt, messages, temperature, maxTokens) {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -249,7 +249,7 @@ async function callOpenAI(systemPrompt, messages, temperature) {
       model: 'gpt-4o-mini',
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       temperature,
-      max_tokens: 600
+      max_tokens: maxTokens
     })
   });
 
