@@ -300,7 +300,9 @@ function parseMediatorOutput(raw) {
         evidenceToChange: parsed.evidenceToChange || []
       }
     };
-  } catch {
+  } catch (e) {
+    console.error('[Mediator parse error]', e.message);
+    console.error('[Mediator raw response]', raw?.slice(0, 500));
     return {
       jointStatement: '(Joint statement could not be generated. Please try again.)',
       summary: {
