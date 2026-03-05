@@ -279,11 +279,16 @@ function trimToWordLimit(text, limit) {
 
 function parseMediatorOutput(raw) {
   try {
-    const cleaned = raw
+    let cleaned = raw
       .replace(/^```json\s*/i, '')
       .replace(/^```\s*/i, '')
       .replace(/```\s*$/i, '')
       .trim();
+    // If the model added preamble text, extract the first {...} block
+    if (!cleaned.startsWith('{')) {
+      const match = cleaned.match(/\{[\s\S]*\}/);
+      if (match) cleaned = match[0];
+    }
     const parsed = JSON.parse(cleaned);
     const jointStatement = (parsed.jointStatement || []).map(b => `- ${b}`).join('\n');
     return {

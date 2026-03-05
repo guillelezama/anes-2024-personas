@@ -422,13 +422,21 @@ Rules:
 Return only the JSON object. No text before or after."""
 
     from langchain_core.messages import SystemMessage, HumanMessage
+    import re as re_lib
     raw = llm.invoke([SystemMessage(content=system), HumanMessage(content=user)]).content
+    print(f"[Mediator raw response]: {raw[:300]}")
 
     try:
         cleaned = raw.strip()
+        # Strip markdown fences
         if cleaned.startswith('```'):
             cleaned = cleaned.split('\n', 1)[1] if '\n' in cleaned else cleaned
             cleaned = cleaned.rsplit('```', 1)[0].strip()
+        # If still not valid JSON, extract the first {...} block
+        if not cleaned.startswith('{'):
+            match = re_lib.search(r'\{.*\}', cleaned, re_lib.DOTALL)
+            if match:
+                cleaned = match.group(0)
         parsed = json_lib.loads(cleaned)
         joint = '\n'.join(f"- {b}" for b in (parsed.get('jointStatement') or []))
         summary = {
@@ -438,7 +446,8 @@ Return only the JSON object. No text before or after."""
             'evidenceToChange': parsed.get('evidenceToChange', [])
         }
         return joint, summary
-    except Exception:
+    except Exception as e:
+        print(f"[Mediator parse error]: {e}\n[Raw]: {raw}")
         return (
             '(Joint statement could not be generated. Please try again.)',
             {'agreements': ['Summary generation failed. Please try again.'],
